@@ -106,6 +106,8 @@ def f_start():
         if my_field.is_goal():
             lb.pos=ball.pos_center+vector(0,5,0)
             lb.visible=True
+            Physis.position_when_onGround(ball,0,0)
+            ball.velocity=vector(0,0,0)
         else:
             lb.visible=False
            

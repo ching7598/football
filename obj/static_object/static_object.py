@@ -101,7 +101,7 @@ class Goal(StaticObject):
         self.set_front_planes();
     
         
-    def ball_inside(self,ball):
+    def ball_touch_goal(self,ball):
         if (ball.pos_center-self.pos_center).mag > (self.goal_width/2):
             return(False)
         else:

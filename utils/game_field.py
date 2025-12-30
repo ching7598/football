@@ -68,7 +68,7 @@ class FieldManager:
             
     def is_goal(self):
         for ball in self.ballList:
-            if (self.leftGoal.ball_inside(ball)) or (self.rightGoal.ball_inside(ball)):
+            if (self.leftGoal.ball_touch_goal(ball)) or (self.rightGoal.ball_touch_goal(ball)):
                 return(True);
         return(False)
         
