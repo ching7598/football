@@ -63,14 +63,12 @@ class FieldManager:
         for player in self.playerList:
             player.think();
             player.next_state();
-        for ball in self.ballList:
-            ball.next_state()
-            
-    def is_goal(self):
-        for ball in self.ballList:
+        for ball in self.ballList:            
             if (self.leftGoal.ball_touch_goal(ball)) or (self.rightGoal.ball_touch_goal(ball)):
-                return(True);
-        return(False)
+                Physis.position_when_onGround(ball,0,0)
+                ball.velocity=vector(0,0,0)
+            else:
+                ball.next_state()
         
 
 
