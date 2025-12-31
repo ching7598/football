@@ -86,11 +86,6 @@ my_field.push_into_field(player1);
 
 
 
-
-lb=label(pos=vector(0,0,0),text="Goal!",height=40, color=color.red, box=False)
-lb.visible=False
-
-
 ##label_ball=label(pos=vector(0, 20, 30),text="",height=40, color=color.yellow, box=False)
 
  # 動畫主迴圈
@@ -103,13 +98,7 @@ def f_start():
         rate(Physis.fps)
         ##label_ball.text=str(player1.velocity)+"\n"+str(player1.acceleration)+"\n"+str(player1.force);
         my_field.next_state()
-        if my_field.is_goal():
-            lb.pos=ball.pos_center+vector(0,5,0)
-            lb.visible=True
-            Physis.position_when_onGround(ball,0,0)
-            ball.velocity=vector(0,0,0)
-        else:
-            lb.visible=False
+
            
     
 
