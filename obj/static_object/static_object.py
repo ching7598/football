@@ -71,7 +71,11 @@ class Goal(StaticObject):
         self.set_size();
         self.showObj.opacity=0.3;
         self.typeName="goal";
+        
+        self.goal_label=label(pos=vector(0,0,0),text="Goal!",height=40, color=color.red, box=False,visible=False)
+     
 
+        
     
     def set_front_planes(self):
         face_vector=self.axis.norm();
@@ -83,6 +87,8 @@ class Goal(StaticObject):
         self.front_planes[0].set_vertex(vertex1,vertex2,vertex3);
         vertex1=vertex3-up_vector*self.goal_height;
         self.front_planes[1].set_vertex(vertex1,vertex3,vertex2);
+        
+ 
         
     
     def set_size(self,goal_depth=None,goal_height=None,goal_width=None):
@@ -96,19 +102,20 @@ class Goal(StaticObject):
         self.set_front_planes()
         
     def set_goalLineCenter(self,point=vector(0,0,0)):
-        self.pos_center=point-((self.goal_depth/2)*self.axis.norm())+vector(0,self.goal_height/2,0);
-        self.set_posCenter();
-        self.set_front_planes();
+        self.pos_center=point-((self.goal_depth/2)*self.axis.norm())+vector(0,self.goal_height/2,0)
+        self.set_posCenter()
+        self.set_front_planes()
+        self.goal_label.pos=point+vector(0,1,0)*self.goal_height*2
     
         
     def ball_touch_goal(self,ball):
-        if (ball.pos_center-self.pos_center).mag > (self.goal_width/2):
-            return(False)
-        else:
-            touch_front_plane=False;
+        touch=False
+        if (ball.pos_center-self.pos_center).mag < (self.goal_width/2):
             for plane in self.front_planes:
-                touch_front_plane=touch_front_plane or (plane.ball_distance(ball)==0)
-            return touch_front_plane
+                touch=touch or (plane.ball_distance(ball)==0)
+        
+        self.goal_label.visible=touch
+        return touch
         
     
     
