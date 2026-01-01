@@ -4,13 +4,26 @@ import math;
 import random;
 
 class MemoryObj:
-    def __init__(self,realObj,pos_center=None,velocity=None):
-        self.pos_center=pos_center
+    def __init__(self,realObj,pos_center=None,velocity=vector(0,0,0),life_time_new=5*Physis.fps):
         self.velocity=velocity
         self.realObj=realObj
+        self.life_time_new=life_time_new 
+        self.life_time=0
+        self.memory_update()
+
+        
+    def memory_fading(self):
+        if self.life_time==0:
+            return False
+        else:
+            self.life_time -=1
+            return True
+        
     def memory_update(self):
-        self.velocity=self.realObj.velocity
+        if hasattr(self.realObj,"velocity"):
+            self.velocity=self.realObj.velocity
         self.pos_center=self.realObj.pos_center
+        self.life_time=self.life_time_new
 
 
 class MemoryPerson(MemoryObj):
@@ -206,11 +219,22 @@ class Player(PhysicalObject):
         ball.add_force(kick_force)
 # ------------------------------------------------------------   
     def belongTeam(self,team):
-        self.memoryDict["myTeam"]=team;
-        self.memoryDict["targetGoalList"]=team.targetGoalList
+        for i in range(len(team.targetGoalList)):
+            goal=team.targetGoalList[i]
+            self.memoryDict["target_goal_"+str(i)]=MemoryObj(goal,life_time_new=3600*Physis.fps)
+
     
     def think(self):
-        myTeam=self.memoryDict.get("myTeam");
+        
+        for key,mobj in list(self.memoryDict.items()): ##記憶清除與更新
+            if not mobj.memory_fading():
+                self.memoryDict.pop(key)
+            elif self.is_in_view(mobj.realObj):
+                mobj.memory_update()
+            else:
+                mobj.pos_center+=(mobj.velocity*Physis.dt)
+        
+
         #targetGoal=self.memoryDict.get("targetGoal");
         
         #先確定場上有沒有球、球門
@@ -222,15 +246,10 @@ class Player(PhysicalObject):
                 if self.is_in_view(obj):
                     if obj.typeName=="ball":
                         memBall=MemoryObj(obj)
-                        memBall.memory_update()
                         self.memoryDict["memBall"]=memBall;
             return;
             
         #先寫一個只會追著球跑，一旦追到球就踢出去的傢伙
-        if self.is_in_view(memBall.realObj):
-            memBall.memory_update();
-        else:
-            memBall.pos_center+=(memBall.velocity*Physis.dt)
         
         if mag(memBall.pos_center-self.pos_center)<0.5:
             self.kick_ball(memBall.realObj)

@@ -49,7 +49,7 @@ class FieldManager:
         delta_pos=ball.pos_center-self.ground.pos_center
         width_vector=self.ground.axis
         length_vector=width_vector.cross(self.ground.showObj.up)
-        return abs(dot(detl_pos,width_vector))>(self.ground.field_width/2) or abs(dot(detl_pos,length_vector))>(self.ground.field_length/2)
+        return abs(dot(delta_pos,width_vector))>(self.ground.field_length/2) or abs(dot(delta_pos,length_vector))>(self.ground.field_width/2)
         
         
     def push_into_field(self,physbj=None,posX=None,posZ=None):
@@ -72,7 +72,7 @@ class FieldManager:
             if (self.leftGoal.ball_touch_goal(ball)) or (self.rightGoal.ball_touch_goal(ball)):
                 Physis.position_when_onGround(ball,0,0)
                 ball.velocity=vector(0,0,0)
-            if self.ball_outside(ball):
+            if ball.velocity.mag>0.1 and self.ball_outside(ball):
                 Physis.position_when_onGround(ball)
                 ball.velocity=vector(0,0,0)
             else:

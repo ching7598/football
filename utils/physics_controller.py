@@ -130,7 +130,6 @@ class Physis:
         return signed_surface_dist
         
     
-    
             
     @staticmethod
     def gravity(physical_obj):
