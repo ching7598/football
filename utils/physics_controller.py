@@ -43,6 +43,10 @@ class Physis:
             obj.set_posCenter(vector(posX,(ground_thickness/2)+(obj.body.height/2),posZ))
         else:
             raise TypeError("未知物件型別")
+
+    @staticmethod
+    def gravity(physical_obj):
+        physical_obj.add_force((Physis.g)*physical_obj.mass);
    
     @staticmethod
     def touch_ground(physical_obj):
@@ -75,10 +79,10 @@ class Physis:
     @staticmethod
     def friction_of_ground(physical_obj):
         if Physis.touch_ground(physical_obj):
-            u,mass=physical_obj.u_ground,physical_obj.mass;
-            v=vector(physical_obj.velocity.x,0,physical_obj.velocity.z);
+            u,mass=physical_obj.u_ground,physical_obj.mass
+            v=vector(physical_obj.velocity.x,0,physical_obj.velocity.z)
             f_friction=v.hat*(mass*Physis.g.mag*u)*(-1)
-            physical_obj.add_force(f_friction);
+            physical_obj.add_force(f_friction)
             return f_friction;
         else:
             return vector(0,0,0)
@@ -130,8 +134,22 @@ class Physis:
         return signed_surface_dist
         
     
-            
     @staticmethod
-    def gravity(physical_obj):
-        physical_obj.add_force((Physis.g)*physical_obj.mass);
+    def player_collision(player1,player2):
+        #先檢查距離
+        delta_pos=player2.pos_center-player1.pos_center
+        if delta_pos.mag<=(player1.waist+player2.waist):
+            m1,m2=player1.mass,player2.mass
+            v1,v2=player1.velocity,player2.velocity
+            v_rel = v2 - v1
+            v_rel_n = v_rel.dot(delta_pos.norm())
+            if v_rel_n>=0:
+                return
+            e = 1.0# Perfectly elastic => restitution e = 1
+            j = -(1 + e) * v_rel_n / (1/m1 + 1/m2)  # Impulse scalar
+            impulse = j * delta_pos.norm()   # Apply impulse
+            player1.velocity = v1 - impulse / m1
+            player2.velocity = v2 + impulse / m2
+                
+
     

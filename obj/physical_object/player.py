@@ -40,7 +40,8 @@ class Player(PhysicalObject):
         
         self.typeName="player";
         self.name=player_name;
-        self.mass=70;
+        self.mass=70
+        self.waist=0.5 #計算球員碰撞用
         self.u_ground=10
         self.e_ground=0.1
         

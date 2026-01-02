@@ -65,14 +65,22 @@ class FieldManager:
         self.teamList.append(team)
    
     def next_state(self):
-        for player in self.playerList:
+        n=len(self.playerList)
+        for i in range(n):#更新球員狀態
+            player=self.playerList[i]
+            for j in range(i+1,n):#檢查跟其他球員碰撞
+                other_player=self.playerList[j]
+                Physis.player_collision(player,other_player)                
             player.think();
             player.next_state();
-        for ball in self.ballList:            
+            
+        for ball in self.ballList:#更新球狀態
+            #看是否進球
             if (self.leftGoal.ball_touch_goal(ball)) or (self.rightGoal.ball_touch_goal(ball)):
                 Physis.position_when_onGround(ball,0,0)
                 ball.velocity=vector(0,0,0)
-            if ball.velocity.mag>0.1 and self.ball_outside(ball):
+            #看是否出界
+            elif ball.velocity.mag>0.1 and self.ball_outside(ball):
                 Physis.position_when_onGround(ball)
                 ball.velocity=vector(0,0,0)
             else:

@@ -67,21 +67,33 @@ button(text="player1_kick", bind=player1_kick)
 
 
 
-my_field=FieldManager();
+my_field=FieldManager()
+
 blueTeam=Team(name="blueTeam",color=color.blue)
-my_field.add_team(blueTeam);
-blueTeam.add_defendGoal(my_field.rightGoal);
-blueTeam.add_targetGoal(my_field.leftGoal);
+my_field.add_team(blueTeam)
+blueTeam.add_defendGoal(my_field.rightGoal)
+blueTeam.add_targetGoal(my_field.leftGoal)
+
+redTeam=Team(name="redTeam",color=color.red)
+my_field.add_team(redTeam)
+redTeam.add_defendGoal(my_field.leftGoal)
+redTeam.add_targetGoal(my_field.rightGoal)
 
 
 
 # 建立足球
 ball=Ball();
-player1=Player(pos_center=vector(0,6,10))
-blueTeam.add_player(player1,10)
 
-my_field.push_into_field(ball);
-my_field.push_into_field(player1);
+player1=Player(pos_center=vector(10,6,10),face_degree=-180)
+player2=Player(pos_center=vector(-10,6,-10))
+blueTeam.add_player(player1,10)
+redTeam.add_player(player2,3)
+
+
+
+my_field.push_into_field(ball)
+my_field.push_into_field(player1)
+my_field.push_into_field(player2)
 
 
 
