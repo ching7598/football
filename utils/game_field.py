@@ -3,7 +3,7 @@ from obj.physical_object.physicalobject import *;
 from obj.physical_object.player import *;
 
 class Team:
-    def __init__(self,name="Myteam",color=color.red):
+    def __init__(self,name="Myteam",color=color.white):
         self.name=name;
         self.playerDict={};
         self.color=color;
@@ -41,6 +41,7 @@ class FieldManager:
         self.centerLine.set_posCenter(self.ground.pos_center+vector(0,self.ground_thickness/2,0));
         print(self.name+": static object complete!");
         
+        self.scoreLabelDict={};
         self.teamList=list();
         self.ballList=list();
         self.playerList=list();
@@ -83,6 +84,11 @@ class FieldManager:
 
     def add_team(self,team):
         self.teamList.append(team)
+        ground=self.ground
+        score_label=label(text="0",height=30,color=team.color)
+        self.scoreLabelDict[team]=score_label
+        score_label.pos=ground.pos_center+vector(len(self.scoreLabelDict)*5,ground.ground_thickness*1.5,ground.field_width/2)
+        
    
     def next_state(self):
         n=len(self.playerList)
@@ -95,15 +101,19 @@ class FieldManager:
             player.next_state();
             
         for ball in self.ballList:#更新球狀態
-            #看是否進球
-            if (self.leftGoal.ball_touch_goal(ball)) or (self.rightGoal.ball_touch_goal(ball)):
-                Physis.position_when_onGround(ball,0,0)
-                ball.velocity=vector(0,0,0)            
-            elif self.ball_outside(ball): 
+            if self.ball_outside(ball): 
                 ball.velocity=vector(0,0,0)
-                print("Ball outside!")               
+                print("Ball outside!") 
             else:
-                ball.next_state()
+                #看是否進球
+                for team in self.teamList:
+                    for goal in team.targetGoalList:
+                        if goal.ball_touch_goal(ball):
+                            Physis.position_when_onGround(ball,0,0)
+                            ball.velocity=vector(0,0,0)
+                            score_label=self.scoreLabelDict[team]
+                            score_label.text=str(int(score_label.text)+1)               
+            ball.next_state()
         
 
 
