@@ -41,7 +41,7 @@ class StaticObject:
    
 
 class Ground(StaticObject):
-    def __init__(self,field_length=100,ground_thickness=10,field_width=60,**kwargs):
+    def __init__(self,field_length=100,ground_thickness=1,field_width=60,**kwargs):
         super().__init__(**kwargs)
         self.field_length=field_length;
         self.ground_thickness=ground_thickness;

@@ -27,7 +27,7 @@ class Team:
 class FieldManager:
     def __init__(self,name="MyField",field_length=100,field_width=60):
         self.name=name;
-        self.ground_thickness=10;
+        self.ground_thickness=0.01;
         self.ground=Ground(
             field_length=field_length,
             ground_thickness=self.ground_thickness,
@@ -87,7 +87,7 @@ class FieldManager:
         ground=self.ground
         score_label=label(text="0",height=30,color=team.color)
         self.scoreLabelDict[team]=score_label
-        score_label.pos=ground.pos_center+vector(len(self.scoreLabelDict)*5,ground.ground_thickness*1.5,ground.field_width/2)
+        score_label.pos=ground.pos_center+vector(len(self.scoreLabelDict)*5,ground.ground_thickness+10,ground.field_width/2)
         
    
     def next_state(self):
