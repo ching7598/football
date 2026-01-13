@@ -51,7 +51,8 @@ class Player(PhysicalObject):
             "head": vector(0,1.5,0),
             "left_eye": vector(0.4,1.5,-0.2),
             "right_eye": vector(0.4,1.5,0.2),
-            "leg_range": vector(0,-1,0)
+            "leg_range": vector(0,-1,0),
+            "back_text": vector(-0.18,0,-0.2)
         }
         
         
@@ -64,6 +65,7 @@ class Player(PhysicalObject):
         # --- 腿部活動範圍 (半透明球) ---
         self.leg_range = sphere(radius=1.2, color=color.green, opacity=0.2)
         # --- 中心位置 ---
+        self.back_text=text(text="?",height=1,color=color.white,axis=vector(0,0,1))
         self.axis = self.body.axis  # 當前朝向
         self.update_body_parts();
         
@@ -72,7 +74,8 @@ class Player(PhysicalObject):
             "head": self.head,
             "left_eye": self.left_eye,
             "right_eye":self.right_eye ,
-            "leg_range": self.leg_range
+            "leg_range": self.leg_range,
+            "back_text":self.back_text
         }
         
         self.abilityList={#注意這些數值是瞬間出力
@@ -91,6 +94,18 @@ class Player(PhysicalObject):
         if point is not None:
             self.pos_center=point;
         self.update_body_parts();
+        
+    def update_back_text(self,str_text):
+        str_text=str(str_text)
+        old_text=self.back_text
+        new_text=text(text=str_text)
+        new_text.pos,new_text.axis,new_text.height=old_text.pos,old_text.axis,old_text.height
+        self._rel["back_text"]=vector(-0.18,0,-0.2*len(str_text))
+        self.back_text=new_text
+        self.partList["back_text"]=new_text
+        old_text.visible=False
+        del old_text
+        
 
 
  
@@ -100,6 +115,8 @@ class Player(PhysicalObject):
         self.left_eye.pos=self.pos_center+self._rel["left_eye"]
         self.right_eye.pos=self.pos_center+self._rel["right_eye"]
         self.leg_range.pos=self.pos_center+ self._rel["leg_range"]
+        self.back_text.pos=self.pos_center+ self._rel["back_text"]
+        
         
     def is_in_view(self,obj):
         delta_pos=obj.pos_center-self.pos_center
@@ -188,7 +205,7 @@ class Player(PhysicalObject):
         angle=-math.radians(degree);
         rot_axis=vector(0,1,0);
         
-        for partName in ["body","head","left_eye","right_eye","leg_range"]:
+        for partName in ["body","head","left_eye","right_eye","leg_range","back_text"]:
         # 旋轉相對位置
             rel_pos=self._rel[partName];
             part=self.partList[partName];

@@ -13,8 +13,9 @@ class Team:
     def add_player(self,player,number):
         player.set_color(self.color)
         player.belongTeam(self)
+        player.update_back_text(number)
         self.playerDict[number]=player
-        
+                
         
     def add_defendGoal(self,goal):
         self.defendGoalList.append(goal)
