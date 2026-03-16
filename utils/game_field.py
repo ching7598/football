@@ -40,7 +40,7 @@ class FieldManager:
         self.rightGoal.set_goalLineCenter(vector(field_length/2,self.ground_thickness/2,0));
         self.centerLine=FieldLine(length=self.ground.field_width);
         self.centerLine.set_posCenter(self.ground.pos_center+vector(0,self.ground_thickness/2,0));
-        print(self.name+": static object complete!");
+        #print(self.name+": static object complete!");
         
         self.scoreLabelDict={};
         self.teamList=list();
@@ -104,7 +104,7 @@ class FieldManager:
         for ball in self.ballList:#更新球狀態
             if self.ball_outside(ball): 
                 ball.velocity=vector(0,0,0)
-                print("Ball outside!") 
+                #print("Ball outside!") 
             else:
                 #看是否進球
                 for team in self.teamList:

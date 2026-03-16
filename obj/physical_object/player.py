@@ -128,7 +128,7 @@ class Player(PhysicalObject):
     def run_forward(self, jump_force=None,degree_launch_angle=45):
         """整個玩家同步移動"""
         if degree_launch_angle>90:
-            print("use backpedal function when the playerer jump back")
+            #print("use backpedal function when the playerer jump back")
             return;
         
         if not Physis.touch_ground(self):
@@ -150,7 +150,7 @@ class Player(PhysicalObject):
     def backpedal(self, jump_force=None,degree_launch_angle=45):
         """整個玩家同步移動"""
         if degree_launch_angle>90:
-            print("use run_forward function when the playerer jump forward")
+            #print("use run_forward function when the playerer jump forward")
             return;
         
         if not Physis.touch_ground(self):
@@ -178,7 +178,7 @@ class Player(PhysicalObject):
     def __shuffle(self, jump_force=None,degree_launch_angle=45,side_direction=None):       
         
         if degree_launch_angle>90:
-            print("degree_launch_angle must < 90")
+            #print("degree_launch_angle must < 90")
             return;
         if not Physis.touch_ground(self):
             return;
@@ -199,7 +199,7 @@ class Player(PhysicalObject):
     # ------------------------------------------------------------
     def turn_right(self,degree):
         if abs(degree)>180:
-            print("player"+self.player_name+" spin too much");
+            #print("player"+self.player_name+" spin too much");
             return;
 
         angle=-math.radians(degree);
@@ -227,12 +227,12 @@ class Player(PhysicalObject):
         #out of range    
         if mag(ball.pos_center-self.leg_range.pos)>(ball.radius+self.leg_range.radius):
             return;
-            print(self.name,":Out of range kicking!")
+            #print(self.name,":Out of range kicking!")
         
         #Exceeds the maximum force limit.
         if mag(kick_force)>self.abilityList["kickBurst"]:
             kick_force=kick_force.norm()*self.abilityList["kickBurst"]
-            print(self.name,":Exceeds the maximum force limit!")
+            #print(self.name,":Exceeds the maximum force limit!")
             
         ball.add_force(kick_force)
 # ------------------------------------------------------------   
