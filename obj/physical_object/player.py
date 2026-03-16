@@ -220,18 +220,24 @@ class Player(PhysicalObject):
         self.update_body_parts()
     
     def kick_ball(self,ball,kick_force=None):
-        #default of kick_force is direct kick forward with maxium effort
-        if kick_force is None:
-            kick_force=self.axis.norm()*self.abilityList["kickBurst"];  
+        dis_ball_player=mag(ball.pos_center-self.leg_range.pos)
+        max_dis=self.leg_range.radius+ball.radius
+        adjustBurst=self.abilityList["kickBurst"]*(1-(dis_ball_player/max_dis))
+  
         
         #out of range    
-        if mag(ball.pos_center-self.leg_range.pos)>(ball.radius+self.leg_range.radius):
+        if dis_ball_player>max_dis:
             return;
             #print(self.name,":Out of range kicking!")
+  
+        #default of kick_force is direct kick forward with maxium effort
+        if kick_force is None:
+            kick_force=self.axis.norm()*adjustBurst;  
+
         
         #Exceeds the maximum force limit.
-        if mag(kick_force)>self.abilityList["kickBurst"]:
-            kick_force=kick_force.norm()*self.abilityList["kickBurst"]
+        if mag(kick_force)>adjustBurst:
+            kick_force=kick_force.norm()*adjustBurst
             #print(self.name,":Exceeds the maximum force limit!")
             
         ball.add_force(kick_force)
@@ -269,7 +275,7 @@ class Player(PhysicalObject):
             
         #先寫一個只會追著球跑，一旦追到球就踢出去的傢伙
         
-        if mag(memBall.pos_center-self.pos_center)<0.5:
+        if mag(memBall.pos_center-self.leg_range.pos)<(memBall.realObj.radius+self.leg_range.radius):
             self.kick_ball(memBall.realObj)
         else:
             rel_spinVector=cross(self.axis,memBall.pos_center-self.pos_center)
