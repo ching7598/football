@@ -4,7 +4,7 @@ import math;
 import random;
 
 class MemoryObj:
-    def __init__(self,realObj,pos_center=None,velocity=vector(0,0,0),life_time_new=5*Physis.fps):
+    def __init__(self,realObj,pos_center=None,velocity=vector(0,0,0),life_time_new=3*Physis.fps):
         self.velocity=velocity
         self.realObj=realObj
         self.life_time_new=life_time_new 
@@ -63,7 +63,7 @@ class Player(PhysicalObject):
         self.left_eye = sphere(radius=0.1, color=color.white)
         self.right_eye = sphere(radius=0.1, color=color.white)
         # --- 腿部活動範圍 (半透明球) ---
-        self.leg_range = sphere(radius=1.2, color=color.green, opacity=0.2)
+        self.leg_range = sphere(radius=1, color=color.green, opacity=0.2)
         # --- 中心位置 ---
         self.back_text=text(text="?",height=1,color=color.white,axis=vector(0,0,1))
         self.axis = self.body.axis  # 當前朝向
@@ -246,45 +246,55 @@ class Player(PhysicalObject):
         for i in range(len(team.targetGoalList)):
             goal=team.targetGoalList[i]
             self.memoryDict["target_goal_"+str(i)]=MemoryObj(goal,life_time_new=3600*Physis.fps)
-
     
-    def think(self):
-        
-        for key,mobj in list(self.memoryDict.items()): ##記憶清除與更新
+    def memory_update(self):##記憶清除與更新
+        for key,mobj in list(self.memoryDict.items()): 
             if not mobj.memory_fading():
                 self.memoryDict.pop(key)
             elif self.is_in_view(mobj.realObj):
                 mobj.memory_update()
             else:
                 mobj.pos_center+=(mobj.velocity*Physis.dt)
+                
+                
+    def find_something(self,memory_name_in_dic,type_name):
+        subject=self.memoryDict.get(memory_name_in_dic)
+        if subject is not None:
+            return subject
+        else:
+            for obj in self.ground.onGround:
+                    if self.is_in_view(obj):
+                        if obj.typeName==type_name:
+                            subject=MemoryObj(obj)
+                            self.memoryDict[memory_name_in_dic]=subject;
+                            return subject
+            return None
+    
+    def think(self):
+        self.memory_update() #記憶按照所見更新，看不見的記憶淡忘或清除
+        memBall=self.find_something("memBall","ball")#找球
+        #targetGoal=self.find_something("targetGoal","goal")
+        
+        #先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
+        if memBall is None:
+            self.turn_right(3)
+            return
+              
+        rel_spinVector=cross(self.axis,memBall.pos_center-self.pos_center)
+        if rel_spinVector.y<0:            
+            self.turn_right(3);
+        elif rel_spinVector.y>0:
+            self.turn_right(-3);
+        if self.is_in_view(memBall.realObj):
+            if mag(memBall.pos_center-self.leg_range.pos)<(memBall.realObj.radius+self.leg_range.radius):
+                self.kick_ball(memBall.realObj)
+                return
+            else:
+                self.run_forward((memBall.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
+
+            
         
 
-        #targetGoal=self.memoryDict.get("targetGoal");
-        
-        #先確定場上有沒有球、球門
-        memBall=self.memoryDict.get("memBall");
-        
-        if memBall is None :#印象中沒有球，先右轉看看能否看到
-            self.turn_right(3);
-            for obj in self.ground.onGround:
-                if self.is_in_view(obj):
-                    if obj.typeName=="ball":
-                        memBall=MemoryObj(obj)
-                        self.memoryDict["memBall"]=memBall;
-            return;
-            
-        #先寫一個只會追著球跑，一旦追到球就踢出去的傢伙
-        
-        if mag(memBall.pos_center-self.leg_range.pos)<(memBall.realObj.radius+self.leg_range.radius):
-            self.kick_ball(memBall.realObj)
-        else:
-            rel_spinVector=cross(self.axis,memBall.pos_center-self.pos_center)
-            if rel_spinVector.y<0:            
-                self.turn_right(3);
-            elif rel_spinVector.y>0:
-                self.turn_right(-3);
-            self.run_forward((memBall.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
-            
         
         
 

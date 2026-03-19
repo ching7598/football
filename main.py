@@ -86,14 +86,17 @@ ball=Ball();
 
 player1=Player(pos_center=vector(10,6,10),face_degree=-180)
 player2=Player(pos_center=vector(-10,6,-10))
+player3=Player_shooter(pos_center=vector(-10,6,10))
 blueTeam.add_player(player1,10)
 redTeam.add_player(player2,3)
+redTeam.add_player(player3,7)
 
 
 
 my_field.push_into_field(ball)
 my_field.push_into_field(player1)
 my_field.push_into_field(player2)
+my_field.push_into_field(player3)
 
 
 

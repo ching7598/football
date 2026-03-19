@@ -1,6 +1,7 @@
 from obj.static_object.static_object import *
 from obj.physical_object.physicalobject import *;
 from obj.physical_object.player import *;
+from obj.physical_object.player_shooter import *;
 
 class Team:
     def __init__(self,name="Myteam",color=color.white):
