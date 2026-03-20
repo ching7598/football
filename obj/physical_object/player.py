@@ -247,7 +247,7 @@ class Player(PhysicalObject):
             goal=team.targetGoalList[i]
             self.memoryDict["target_goal_"+str(i)]=MemoryObj(goal,life_time_new=3600*Physis.fps)
     
-    def memory_update(self):##記憶清除與更新
+    def memory_update(self):#記憶按照所見更新，看不見的記憶淡忘或清除
         for key,mobj in list(self.memoryDict.items()): 
             if not mobj.memory_fading():
                 self.memoryDict.pop(key)
@@ -257,7 +257,7 @@ class Player(PhysicalObject):
                 mobj.pos_center+=(mobj.velocity*Physis.dt)
                 
                 
-    def find_something(self,memory_name_in_dic,type_name):
+    def find_something(self,memory_name_in_dic,type_name): #轉頭從視野中找物件，但記憶中還有就不找
         subject=self.memoryDict.get(memory_name_in_dic)
         if subject is not None:
             return subject
@@ -268,29 +268,36 @@ class Player(PhysicalObject):
                             subject=MemoryObj(obj)
                             self.memoryDict[memory_name_in_dic]=subject;
                             return subject
+            self.turn_right(3)
             return None
+
+    def chasing_ball(self,mem_ball,goal_distance=0.5): 
+        see_ball=self.is_in_view(mem_ball.realObj)
+        ball_possession=mag(mem_ball.pos_center-self.leg_range.pos)<goal_distance
+        if see_ball:
+            if ball_possession:
+                return True
+            else:
+                rel_spinVector=cross(self.axis,mem_ball.pos_center-self.pos_center) 
+                if rel_spinVector.y<0:            
+                    self.turn_right(3)
+                elif rel_spinVector.y>0:
+                    self.turn_right(-3)
+                self.run_forward((mem_ball.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
+        return False
     
-    def think(self):
-        self.memory_update() #記憶按照所見更新，看不見的記憶淡忘或清除
+    def think(self):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
+        self.memory_update() 
         memBall=self.find_something("memBall","ball")#找球
         #targetGoal=self.find_something("targetGoal","goal")
         
-        #先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
-        if memBall is None:
-            self.turn_right(3)
-            return
-              
-        rel_spinVector=cross(self.axis,memBall.pos_center-self.pos_center)
-        if rel_spinVector.y<0:            
-            self.turn_right(3);
-        elif rel_spinVector.y>0:
-            self.turn_right(-3);
-        if self.is_in_view(memBall.realObj):
-            if mag(memBall.pos_center-self.leg_range.pos)<(memBall.realObj.radius+self.leg_range.radius):
-                self.kick_ball(memBall.realObj)
-                return
-            else:
-                self.run_forward((memBall.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
+        
+        if memBall is not None:
+                if self.chasing_ball(memBall,memBall.realObj.radius+self.leg_range.radius):
+                    self.kick_ball(memBall.realObj)
+
+
+        
 
             
         
