@@ -20,6 +20,7 @@ class Team:
         
     def add_defendGoal(self,goal):
         self.defendGoalList.append(goal)
+        goal.belongTeam=self
     
     def add_targetGoal(self,goal):
         self.targetGoalList.append(goal)
@@ -47,6 +48,10 @@ class FieldManager:
         self.teamList=list();
         self.ballList=list();
         self.playerList=list();
+        
+        self.all_going_home=True
+        self.wait_starting_ball=True
+        self.starting_team=None
 
     def ball_outside(self,ball):
         
@@ -90,17 +95,47 @@ class FieldManager:
         score_label=label(text="0",height=30,color=team.color)
         self.scoreLabelDict[team]=score_label
         score_label.pos=ground.pos_center+vector(len(self.scoreLabelDict)*5,ground.ground_thickness+10,ground.field_width/2)
+        self.starting_team=team
         
    
     def next_state(self):
+        
+        if self.all_going_home:
+            all_home=True
+            for team in self.teamList:
+                target_pos=team.targetGoalList[0].pos_center
+                defense_pos=team.defendGoalList[0].pos_center
+                for player in team.playerDict.values():
+                    player.think(wait_to_start_ball=True)
+                    player.next_state()
+                    all_home=all_home and (mag(player.pos_center-target_pos) > mag(player.pos_center-defense_pos))
+            self.all_going_home=not all_home
+            return
+        elif self.wait_starting_ball:
+            for team in self.teamList:
+                if team==self.starting_team:
+                    for player in team.playerDict.values():
+                        player.think(wait_to_start_ball=False)
+                        player.next_state()
+                else:
+                    for player in team.playerDict.values():
+                        player.think(wait_to_start_ball=True)
+                        player.next_state()
+            ball_moved=False
+            for ball in self.ballList:
+                ball.next_state()
+                ball_moved=ball_moved or (mag(ball.velocity)>1)
+            self.wait_starting_ball=not ball_moved
+            return
+        
         n=len(self.playerList)
         for i in range(n):#更新球員狀態
             player=self.playerList[i]
             for j in range(i+1,n):#檢查跟其他球員碰撞
                 other_player=self.playerList[j]
                 Physis.player_collision(player,other_player)                
-            player.think();
-            player.next_state();
+            player.think(wait_to_start_ball=False)
+            player.next_state()
             
         for ball in self.ballList:#更新球狀態
             if self.ball_outside(ball): 
@@ -114,7 +149,10 @@ class FieldManager:
                             Physis.position_when_onGround(ball,0,0)
                             ball.velocity=vector(0,0,0)
                             score_label=self.scoreLabelDict[team]
-                            score_label.text=str(int(score_label.text)+1)               
+                            score_label.text=str(int(score_label.text)+1)
+                            self.all_going_home=True
+                            self.wait_starting_ball=True
+                            self.starting_team=goal.belongTeam
             ball.next_state()
         
 

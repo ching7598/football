@@ -73,6 +73,7 @@ class Goal(StaticObject):
         self.typeName="goal";
         
         self.goal_label=label(pos=vector(0,0,0),text="Goal!",height=40, color=color.red, box=False,visible=False)
+        self.belongTeam=None
      
 
         

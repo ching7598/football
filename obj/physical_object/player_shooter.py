@@ -21,17 +21,22 @@ class Player_shooter(Player):
                 return True
         return False
     
-    def think(self):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
+    def think(self,wait_to_start_ball):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
         self.memory_update() 
-        memBall=self.find_something("memBall","ball")#找球
+        memBall=self.find_something("memBall","ball",life_sec_new=2)#找球
+        
+        if wait_to_start_ball:
+            self.chasing_object(self.memoryDict.get("start_position"),2)
+            return
+        
         
         mem_target_goal=self.memoryDict["target_goal_0"]
         if mem_target_goal is None:#如果還沒被指定到隊，沒有目標球門，就不動
             return
         
         if memBall is not None:
-            if not self.shoot(memBall,mem_target_goal):                    
-                self.chasing_ball(memBall,0)
+            if not self.shoot(memBall,mem_target_goal):
+                self.chasing_object(memBall,0)
                    
 
             

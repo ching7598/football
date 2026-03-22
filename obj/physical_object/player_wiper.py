@@ -8,30 +8,51 @@ import math
 class Player_wiper(Player):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        self.memoryDict["threat_dis"]=MemoryObj(35,life_time_new=3600*Physis.fps)
  
-    def wipe_out(self,mem_ball,mem_target_goal):
+    def wipe_out(self,mem_ball,mem_defend_goal):
         if mag(mem_ball.pos_center-self.leg_range.pos)<(self.leg_range.radius+ball.radius):
-            dot_value=dot(self.axis,(mem_target_goal.pos_center-self.pos_center))
-            if dot_value<0:
-                wipe_vector=mem_target_goal.realObj.axis+vector(0,1,0)
-                self.kick_ball(mem_ball.realObj,kick_force=wipe_vector*2000)
-
+            wipe_force=(mem_defend_goal.realObj.axis+vector(0,1,0))*self.abilityList["500"]
+            self.kick_ball( mem_ball.realObj,kick_force=wipe_force)
             return True
-        else:
-            return False
+        return False
+        
+    def back_to_defend_area(self,rush):
+        
     
-    def think(self):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
+    def think(self,wait_to_start_ball):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
         self.memory_update() 
         memBall=self.find_something("memBall","ball")#找球
         
-        mem_target_goal=self.memoryDict["target_goal_0"]
-        if mem_target_goal is None:#如果還沒被指定到隊，沒有目標球門，就不動
+        if wait_to_start_ball:
+            self.chasing_object(self.memoryDict.get("start_position"),2)
             return
         
+        
+        mem_defend_goal=self.memoryDict["defend_goal_0"]
+        if mem_defend_goal is None:#如果還沒被指定到隊，沒有目標球門，就不動
+            return
+        
+        
+        
         if memBall is not None:
-            if not self.shoot(memBall,mem_target_goal):                    
-                self.chasing_ball(memBall,0)
-                   
+            threat_dis=self.memoryDict["threat_dis"]
+            
+            dis_ball_goal=mag(memBall.pos_center-mem_defend_goal.pos_center)            
+            if dis_ball_goal>threat_dis:
+                self.back_to_defend_area()
+            
+            elif diss_ball_goal short:
+                if ball ahead:
+                    chase
+                    wipe
+                else:
+                    if ball_go_goal:
+                        chase
+                        back wipe
+                    else:
+                        chase
+                        front wipe
 
             
   

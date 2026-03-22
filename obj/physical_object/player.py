@@ -4,11 +4,13 @@ import math;
 import random;
 
 class MemoryObj:
-    def __init__(self,realObj,pos_center=None,velocity=vector(0,0,0),life_time_new=3*Physis.fps):
+    def __init__(self,realObj,pos_center=None,velocity=vector(0,0,0),life_sec_new=3):
         self.velocity=velocity
+        self.pos_center=pos_center
         self.realObj=realObj
-        self.life_time_new=life_time_new 
+        self.life_time_new=0
         self.life_time=0
+        self.set_life_time_new(life_sec_new)        
         self.memory_update()
 
         
@@ -20,10 +22,15 @@ class MemoryObj:
             return True
         
     def memory_update(self):
-        if hasattr(self.realObj,"velocity"):
-            self.velocity=self.realObj.velocity
-        self.pos_center=self.realObj.pos_center
+        if self.realObj is not None:# ex: position, not a real object
+            if hasattr(self.realObj,"velocity"):
+                self.velocity=self.realObj.velocity
+            self.pos_center=self.realObj.pos_center
         self.life_time=self.life_time_new
+        
+    def set_life_time_new(self,sec):
+        self.life_time_new=sec*Physis.fps
+
 
 
 class MemoryPerson(MemoryObj):
@@ -86,7 +93,7 @@ class Player(PhysicalObject):
         }
         
         self.viewAngle=140;
-        self.memoryDict={}
+        self.memoryDict={"start_position":MemoryObj(realObj=None,pos_center=self.pos_center,velocity=vector(0,0,0),life_sec_new=3600)}
         
     # ------------------------------------------------------------       
 
@@ -234,6 +241,9 @@ class Player(PhysicalObject):
         if kick_force is None:
             kick_force=self.axis.norm()*adjustBurst;  
 
+        angle= math.acos(max(-1,min(1,dot(kick_force.norm(),self.axis.norm()))))
+        if angle > 1.57:
+            adjustBurst=min(adjustBurst,100)
         
         #Exceeds the maximum force limit.
         if mag(kick_force)>adjustBurst:
@@ -245,19 +255,22 @@ class Player(PhysicalObject):
     def belongTeam(self,team):
         for i in range(len(team.targetGoalList)):
             goal=team.targetGoalList[i]
-            self.memoryDict["target_goal_"+str(i)]=MemoryObj(goal,life_time_new=3600*Physis.fps)
+            self.memoryDict["target_goal_"+str(i)]=MemoryObj(goal,life_sec_new=3600)
+        for i in range(len(team.defendGoalList)):
+            goal=team.defendGoalList[i]
+            self.memoryDict["defend_goal_"+str(i)]=MemoryObj(goal,life_sec_new=3600)
     
     def memory_update(self):#記憶按照所見更新，看不見的記憶淡忘或清除
         for key,mobj in list(self.memoryDict.items()): 
             if not mobj.memory_fading():
                 self.memoryDict.pop(key)
-            elif self.is_in_view(mobj.realObj):
+            elif self.is_in_view(mobj):
                 mobj.memory_update()
             else:
                 mobj.pos_center+=(mobj.velocity*Physis.dt)
                 
                 
-    def find_something(self,memory_name_in_dic,type_name): #轉頭從視野中找物件，但記憶中還有就不找
+    def find_something(self,memory_name_in_dic,type_name,life_sec_new=None): #轉頭從視野中找物件，但記憶中還有就不找
         subject=self.memoryDict.get(memory_name_in_dic)
         if subject is not None:
             return subject
@@ -265,35 +278,37 @@ class Player(PhysicalObject):
             for obj in self.ground.onGround:
                     if self.is_in_view(obj):
                         if obj.typeName==type_name:
-                            subject=MemoryObj(obj)
+                            subject=MemoryObj(obj,life_sec_new=life_sec_new)
                             self.memoryDict[memory_name_in_dic]=subject;
                             return subject
             self.turn_right(3)
             return None
 
-    def chasing_ball(self,mem_ball,goal_distance=0.5): 
-        see_ball=self.is_in_view(mem_ball.realObj)
-        ball_possession=mag(mem_ball.pos_center-self.leg_range.pos)<goal_distance
-        if see_ball:
-            if ball_possession:
-                return True
-            else:
-                rel_spinVector=cross(self.axis,mem_ball.pos_center-self.pos_center) 
-                if rel_spinVector.y<0:            
-                    self.turn_right(3)
-                elif rel_spinVector.y>0:
-                    self.turn_right(-3)
-                self.run_forward((mem_ball.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
+    def chasing_object(self,mem_obj,goal_distance=0.5): 
+        ball_possession=mag(mem_obj.pos_center-self.leg_range.pos)<goal_distance
+
+        if ball_possession:
+            return True
+        else:
+            rel_spinVector=cross(self.axis,mem_obj.pos_center-self.pos_center) 
+            if rel_spinVector.y<0:            
+                self.turn_right(3)
+            elif rel_spinVector.y>0:
+                self.turn_right(-3)
+            self.run_forward((mem_obj.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
         return False
     
-    def think(self):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
+    def think(self,wait_to_start_ball):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
         self.memory_update() 
-        memBall=self.find_something("memBall","ball")#找球
+        memBall=self.find_something("memBall","ball",life_sec_new=2)#找球
         #targetGoal=self.find_something("targetGoal","goal")
         
+        if wait_to_start_ball:
+            self.chasing_object(self.memoryDict.get("start_position"),2)
+            return
         
         if memBall is not None:
-                if self.chasing_ball(memBall,memBall.realObj.radius+self.leg_range.radius):
+                if self.chasing_object(memBall,memBall.realObj.radius+self.leg_range.radius):
                     self.kick_ball(memBall.realObj)
 
 
