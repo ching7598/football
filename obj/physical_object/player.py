@@ -297,15 +297,15 @@ class Player(PhysicalObject):
                 self.turn_right(-3)
             self.run_forward((mem_obj.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
         return False
+
+    def think_wait_starting(self):
+        self.chasing_object(self.memoryDict.get("start_position"),2)
     
-    def think(self,wait_to_start_ball):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
+    def think(self):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
         self.memory_update() 
         memBall=self.find_something("memBall","ball",life_sec_new=2)#找球
         #targetGoal=self.find_something("targetGoal","goal")
         
-        if wait_to_start_ball:
-            self.chasing_object(self.memoryDict.get("start_position"),2)
-            return
         
         if memBall is not None:
                 if self.chasing_object(memBall,memBall.realObj.radius+self.leg_range.radius):

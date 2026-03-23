@@ -106,7 +106,7 @@ class FieldManager:
                 target_pos=team.targetGoalList[0].pos_center
                 defense_pos=team.defendGoalList[0].pos_center
                 for player in team.playerDict.values():
-                    player.think(wait_to_start_ball=True)
+                    player.think_wait_starting()
                     player.next_state()
                     all_home=all_home and (mag(player.pos_center-target_pos) > mag(player.pos_center-defense_pos))
             self.all_going_home=not all_home
@@ -115,11 +115,11 @@ class FieldManager:
             for team in self.teamList:
                 if team==self.starting_team:
                     for player in team.playerDict.values():
-                        player.think(wait_to_start_ball=False)
+                        player.think()
                         player.next_state()
                 else:
                     for player in team.playerDict.values():
-                        player.think(wait_to_start_ball=True)
+                        player.think_wait_starting()
                         player.next_state()
             ball_moved=False
             for ball in self.ballList:
@@ -134,7 +134,7 @@ class FieldManager:
             for j in range(i+1,n):#檢查跟其他球員碰撞
                 other_player=self.playerList[j]
                 Physis.player_collision(player,other_player)                
-            player.think(wait_to_start_ball=False)
+            player.think()
             player.next_state()
             
         for ball in self.ballList:#更新球狀態

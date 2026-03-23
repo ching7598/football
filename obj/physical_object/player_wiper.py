@@ -20,14 +20,11 @@ class Player_wiper(Player):
     def back_to_defend_area(self,rush):
         
     
-    def think(self,wait_to_start_ball):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
+    def think(self):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
         self.memory_update() 
         memBall=self.find_something("memBall","ball")#找球
         
-        if wait_to_start_ball:
-            self.chasing_object(self.memoryDict.get("start_position"),2)
-            return
-        
+       
         
         mem_defend_goal=self.memoryDict["defend_goal_0"]
         if mem_defend_goal is None:#如果還沒被指定到隊，沒有目標球門，就不動
