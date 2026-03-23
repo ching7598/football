@@ -295,7 +295,9 @@ class Player(PhysicalObject):
                 self.turn_right(3)
             elif rel_spinVector.y>0:
                 self.turn_right(-3)
-            self.run_forward((mem_obj.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
+            #self.run_forward((mem_obj.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
+            forward_speed=dot(self.velocity,self.axis)#因為self.axis.mag永遠是1，dot就是分速度大小
+            self.run_forward(((mem_obj.pos_center-self.pos_center).mag/Physis.dt-forward_speed)*self.mass/Physis.dt)
         return False
 
     def think_wait_starting(self):
