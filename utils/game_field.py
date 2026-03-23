@@ -140,6 +140,8 @@ class FieldManager:
         for ball in self.ballList:#更新球狀態
             if self.ball_outside(ball): 
                 ball.velocity=vector(0,0,0)
+                for player in self.playerList:
+                    player.think_drop_memBall()
                 #print("Ball outside!") 
             else:
                 #看是否進球

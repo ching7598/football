@@ -303,6 +303,10 @@ class Player(PhysicalObject):
     def think_wait_starting(self):
         self.chasing_object(self.memoryDict.get("start_position"),2)
     
+    def think_drop_memBall(self):
+        if not self.memoryDict.get("memBall"):
+            self.memoryDict.pop("memBall")
+    
     def think(self):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙
         self.memory_update() 
         memBall=self.find_something("memBall","ball",life_sec_new=2)#找球
