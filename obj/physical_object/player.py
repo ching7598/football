@@ -4,10 +4,11 @@ import math;
 import random;
 
 class MemoryObj:
-    def __init__(self,realObj,pos_center=None,velocity=vector(0,0,0),life_sec_new=3):
+    def __init__(self,realObj,pos_center=None,value=0,velocity=vector(0,0,0),life_sec_new=3):
         self.velocity=velocity
         self.pos_center=pos_center
         self.realObj=realObj
+        self.value=value
         self.life_time_new=0
         self.life_time=0
         self.set_life_time_new(life_sec_new)        
@@ -270,7 +271,7 @@ class Player(PhysicalObject):
                 mobj.pos_center+=(mobj.velocity*Physis.dt)
                 
                 
-    def find_something(self,memory_name_in_dic,type_name,life_sec_new=None): #轉頭從視野中找物件，但記憶中還有就不找
+    def find_something(self,memory_name_in_dic,type_name,life_sec_new=3): #轉頭從視野中找物件，但記憶中還有就不找
         subject=self.memoryDict.get(memory_name_in_dic)
         if subject is not None:
             return subject
@@ -295,6 +296,8 @@ class Player(PhysicalObject):
                 self.turn_right(3)
             elif rel_spinVector.y>0:
                 self.turn_right(-3)
+            elif dot(self.axis,mem_obj.pos_center-self.pos_center)<0:
+                self.turn_right(130)
             #self.run_forward((mem_obj.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
             forward_speed=dot(self.velocity,self.axis)#因為self.axis.mag永遠是1，dot就是分速度大小
             self.run_forward(((mem_obj.pos_center-self.pos_center).mag/Physis.dt-forward_speed)*self.mass/Physis.dt)
@@ -304,7 +307,7 @@ class Player(PhysicalObject):
         self.chasing_object(self.memoryDict.get("start_position"),2)
     
     def think_drop_memBall(self):
-        if not self.memoryDict.get("memBall"):
+        if not self.memoryDict.get("memBall") is None:
             self.memoryDict.pop("memBall")
     
     def think(self):#先寫一個只會一直找球並追著球跑，一旦追到球就踢出去的傢伙

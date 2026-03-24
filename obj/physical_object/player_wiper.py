@@ -8,22 +8,21 @@ import math
 class Player_wiper(Player):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.memoryDict["threat_dis"]=MemoryObj(35,life_time_new=3600*Physis.fps)
+        self.memoryDict["threat_dis"]=MemoryObj(value=18,realObj=None,pos_center=self.pos_center,velocity=vector(0,0,0),life_sec_new=3600)
+        self.memoryDict["defend_dis"]=MemoryObj(value=35,realObj=None,pos_center=self.pos_center,velocity=vector(0,0,0),life_sec_new=3600)
  
-    def wipe_out(self,mem_ball,mem_defend_goal):
-        if mag(mem_ball.pos_center-self.leg_range.pos)<(self.leg_range.radius+ball.radius):
-            wipe_force=(mem_defend_goal.realObj.axis+vector(0,1,0))*self.abilityList["500"]
+    def wipe_out(self,mem_ball,angle):
+        if mag(mem_ball.pos_center-self.leg_range.pos)<(self.leg_range.radius+mem_ball.realObj.radius):
+            wipe_force=(self.axis+vector(0,0.7,0)+vector(0,0,1)*math.tan(angle)).norm()*self.abilityList["kickBurst"]
             self.kick_ball( mem_ball.realObj,kick_force=wipe_force)
             return True
         return False
         
-    def back_to_defend_area(self,rush):
         
     
-    def think(self):#只會一直找球並追著球跑，一旦追到球就轉身對準球門，然後全力射
+    def think(self):
         self.memory_update() 
-        memBall=self.find_something("memBall","ball")#找球
-        
+        memBall=self.find_something("memBall","ball")#找球     
        
         
         mem_defend_goal=self.memoryDict["defend_goal_0"]
@@ -33,23 +32,33 @@ class Player_wiper(Player):
         
         
         if memBall is not None:
-            threat_dis=self.memoryDict["threat_dis"]
+            defend_dis=self.memoryDict["defend_dis"].value
+            threat_dis=self.memoryDict["threat_dis"].value
             
-            dis_ball_goal=mag(memBall.pos_center-mem_defend_goal.pos_center)            
-            if dis_ball_goal>threat_dis:
-                self.back_to_defend_area()
-            
-            elif diss_ball_goal short:
-                if ball ahead:
-                    chase
-                    wipe
-                else:
-                    if ball_go_goal:
-                        chase
-                        back wipe
+            dis_ball_goal=(memBall.pos_center-mem_defend_goal.pos_center).mag           
+            if dis_ball_goal>defend_dis:
+                self.think_wait_starting()            
+            elif dis_ball_goal>threat_dis:
+                if self.chasing_object(memBall,self.leg_range.radius*0.6):
+                    mem_target_goal=self.memoryDict["target_goal_0"]
+                    goal_self_vector=mem_target_goal.pos_center-self.pos_center
+                    angle=math.radians(math.acos(dot(self.axis,goal_self_vector.norm() )))
+                    rel_spinVector=cross(self.axis,mem_target_goal.pos_center-self.pos_center)
+                    sign=(rel_spinVector.y>0)-(rel_spinVector.y<0) #取正負號
+                    if angle<15:
+                        self.wipe_out(memBall,(-1)*sign*angle)
                     else:
-                        chase
-                        front wipe
+                        self.turn_right((-1)*sign*angle)
+            else:
+                if self.chasing_object(memBall,memBall.realObj.radius+self.leg_range.radius):
+                    goal_self_vector=mem_defend_goal.pos_center-self.pos_center
+                    angle=math.radians(math.acos(dot(self.axis,goal_self_vector.norm() )))     
+                    if angle>30:
+                        self.wipe_out(mem_ball,0)
+                    else:
+                        rel_spinVector=cross(self.axis,mem_defend_goal.pos_center-self.pos_center)
+                        sign=(rel_spinVector.y>0)-(rel_spinVector.y<0) #取正負號
+                        self.wipe_out(memBall,sign*angle)
 
             
   

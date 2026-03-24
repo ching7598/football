@@ -53,11 +53,11 @@ def player1_kick(btn):
 button(text="❌ 結束動畫", bind=stop_animation)
 button(text="kick", bind=kick_ball)
 scene.append_to_caption('X：')
-f_x_input = winput(bind=None)
+f_x_input = winput(bind=None,text="0")
 scene.append_to_caption('Y：')
-f_y_input = winput(bind=None)
+f_y_input = winput(bind=None,text="0")
 scene.append_to_caption('Z：')
-f_z_input = winput(bind=None)
+f_z_input = winput(bind=None,text="0")
 button(text="player1_forward", bind=player1_run)
 button(text="player1_back", bind=player1_back)
 button(text="player1_turn30", bind=player1_turn)
@@ -85,11 +85,13 @@ redTeam.add_targetGoal(my_field.rightGoal)
 ball=Ball();
 
 player1=Player(pos_center=vector(10,6,10),face_degree=-180)
-player2=Player(pos_center=vector(-10,6,-10))
-player3=Player_shooter(pos_center=vector(-10,6,10))
+player2=Player_shooter(pos_center=vector(-10,6,-10))
+player3=Player_shooter(pos_center=vector(-20,6,10))
+player4=Player_wiper(pos_center=vector(38,6,0),face_degree=-180)
 blueTeam.add_player(player1,10)
 redTeam.add_player(player2,3)
 redTeam.add_player(player3,7)
+blueTeam.add_player(player4,2)
 
 
 
@@ -97,6 +99,7 @@ my_field.push_into_field(ball)
 my_field.push_into_field(player1)
 my_field.push_into_field(player2)
 my_field.push_into_field(player3)
+my_field.push_into_field(player4)
 
 
 
