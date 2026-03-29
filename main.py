@@ -32,8 +32,13 @@ def kick_ball(btn):
         )        
     )
     
-def player1_run(btn):
-    player1.run_forward()
+def player_stop(btn):
+    player=btn.value
+    if player.abilityList['runBurst']:
+        player.abilityList['runBurst']=0
+    else:
+        player.abilityList['runBurst']=20000
+    
 
 def player1_back(btn):
     player1.backpedal()
@@ -50,19 +55,6 @@ def player1_kick(btn):
 
     
 
-button(text="❌ 結束動畫", bind=stop_animation)
-button(text="kick", bind=kick_ball)
-scene.append_to_caption('X：')
-f_x_input = winput(bind=None,text="0")
-scene.append_to_caption('Y：')
-f_y_input = winput(bind=None,text="0")
-scene.append_to_caption('Z：')
-f_z_input = winput(bind=None,text="0")
-button(text="player1_forward", bind=player1_run)
-button(text="player1_back", bind=player1_back)
-button(text="player1_turn30", bind=player1_turn)
-button(text="player1_shuffle", bind=player1_shuffle)
-button(text="player1_kick", bind=player1_kick)
 
 
 
@@ -101,6 +93,22 @@ my_field.push_into_field(player2)
 my_field.push_into_field(player3)
 my_field.push_into_field(player4)
 
+
+
+
+
+button(text="❌ 結束動畫", bind=stop_animation)
+button(text="kick", bind=kick_ball)
+scene.append_to_caption('X：')
+f_x_input = winput(bind=None,text="0")
+scene.append_to_caption('Y：')
+f_y_input = winput(bind=None,text="0")
+scene.append_to_caption('Z：')
+f_z_input = winput(bind=None,text="0")
+button(text="player2", bind=player_stop, value=player2)
+button(text="player1", bind=player_stop, value=player1)
+button(text="player3", bind=player_stop, value=player3)
+button(text="player4", bind=player_stop, value=player4)
 
 
 

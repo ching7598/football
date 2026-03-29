@@ -299,7 +299,8 @@ class Player(PhysicalObject):
             elif dot(self.axis,mem_obj.pos_center-self.pos_center)<0:
                 self.turn_right(130)
             #self.run_forward((mem_obj.pos_center-self.pos_center).mag*(self.abilityList.get("runBurst")/2))
-            forward_speed=dot(self.velocity,self.axis)#因為self.axis.mag永遠是1，dot就是分速度大小
+            relative_velocity=self.velocity-mem_obj.velocity
+            forward_speed=dot(relative_velocity,self.axis)#因為self.axis.mag永遠是1，dot就是分速度大小
             self.run_forward(((mem_obj.pos_center-self.pos_center).mag/Physis.dt-forward_speed)*self.mass/Physis.dt)
         return False
 
